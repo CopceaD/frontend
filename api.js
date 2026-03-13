@@ -61,10 +61,10 @@ window.api = {
     },
 
     async register(userCreationDTO) {
-        const response = await fetch(`${API_BASE}/user/`, {
+        const response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userCreationDTO)
+            body: JSON.stringify({ ...userCreationDTO, role: userCreationDTO.role || 'Customer' })
         });
         if (!response.ok) {
             throw new Error("Email already in use or configuration error.");
@@ -75,6 +75,15 @@ window.api = {
     logout() {
         localStorage.removeItem('jwtToken');
         window.location.href = 'index.html';
+    },
+
+    // Helper: build Authorization header with JWT token
+    getAuthHeaders() {
+        const token = localStorage.getItem('jwtToken');
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
     },
 
     // Get current logged-in user from fake JWT
